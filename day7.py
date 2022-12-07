@@ -33,7 +33,9 @@ class Directory:
 
 
 def visit_collect(
-    d: Directory, predicate: Callable[[Directory], bool], acc:List[Directory] = 
+    d: Directory,
+    predicate: Callable[[Directory], bool],
+    acc: Optional[List[Directory]] = None,
 ) -> List[Directory]:
 
     if acc == None:
@@ -49,7 +51,7 @@ def visit_collect(
 
 def parse(input) -> Directory:
     with open(input) as f:
-        navigation : Directory = Directory("/")
+        navigation: Directory = Directory("/")
         for line in f:
             line_el = line.strip().split(" ")
             match line_el:
@@ -81,10 +83,6 @@ def bigger_than_100k(d: Directory) -> bool:
     return d.size() < 100000
 
 
-        
-    
-    
-
 def part1(input: str):
     root = parse(input)
     collected = visit_collect(root, bigger_than_100k)
@@ -97,13 +95,14 @@ def part2(input: str):
     TOTAL = 70000000
     NEED = 30000000
     used_space = root.size()
+
     def delete_candidates(d: Directory) -> bool:
         free_space_now = TOTAL - used_space
         free_after_delete = free_space_now + d.size()
         return free_after_delete >= NEED
+
     collected = visit_collect(root, delete_candidates)
     return min([d.size() for d in collected])
-    
 
 
 if __name__ == "__main__":
