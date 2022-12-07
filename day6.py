@@ -1,7 +1,5 @@
-import os
-import timeit
 
-
+from util import run_day
 def marker(msg: str, n: int) -> int:
     for i in range(n, len(msg)):
         uniq = len(set(msg[i - n : i]))
@@ -39,7 +37,9 @@ def marker_fast(msg: str, n: int) -> int:
     return -1
 
 
+
 if __name__ == "__main__":
+    
     print(8 * "=" + " PART1 " + 8 * "=")
     with open("input/day6-sample.txt") as f:
         lines = list(filter(None, map(lambda x: x.strip(), f.readlines())))
@@ -53,10 +53,10 @@ if __name__ == "__main__":
         for l in lines:
             print(f"Packet start: {marker(l, 4)} {marker_fast(l, 4)}")  
 
-        import cProfile
-        import re
-        for l in lines:
-            print(timeit.timeit("marker(l, 14)", globals=locals(), number=10000))
-            print(timeit.timeit("marker_fast(l, 14)", globals=locals(), number=10000))
+        # import timeit
+        # import cProfile
+        # for l in lines:
+        #     print(timeit.timeit("marker(l, 14)", globals=locals(), number=10000))
+        #     print(timeit.timeit("marker_fast(l, 14)", globals=locals(), number=10000))
             # cProfile.run('marker(l, 14)')
             # cProfile.run('marker_fast(l, 14)')
