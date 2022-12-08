@@ -49,39 +49,31 @@ def scenic_score(plane: Plane, x: int, y: int) -> int:
     # right
     right_sum = 0
     for xi in range(x + 1, x_len):
-        if height > plane[y][xi].height:
-            right_sum += 1
-        else:
-            right_sum += 1
+        right_sum += 1
+        if height <= plane[y][xi].height:
             break
 
     # left
     left_sum = 0
     for xi in range(x - 1, -1, -1):
-        if height > plane[y][xi].height:
-            left_sum += 1
-        else:
-            left_sum += 1
+        left_sum += 1
+        if height <= plane[y][xi].height:
             break
 
     # down
     down = 0
     for yi in range(y + 1, y_len):
-        if height > plane[yi][x].height:
-            down += 1
-        else:
-            down += 1
+        down += 1
+        if height <= plane[yi][x].height:
             break
 
     # up
     up_sum = 0
     for yi in range(y - 1, -1, -1):
-        if height > plane[yi][x].height:
-
-            up_sum += 1
-        else:
-            up_sum += 1
+        up_sum += 1
+        if height <= plane[yi][x].height:
             break
+
     return left_sum * right_sum * up_sum * down
 
 
