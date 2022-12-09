@@ -144,7 +144,7 @@ def part1(input):
 
 def part2(input):
     rope = (Point(0, 0, "H"),) + tuple((Point(0, 0, f"{i}") for i in range(1, 10)))
-    tail_pos_acc = [Point(0,0,9)]
+    tail_pos_acc = [Point(0, 0, 9)]
     with open(input) as f:
         for line in f:
             (move, cnt) = line.strip().split(" ")
@@ -153,8 +153,8 @@ def part2(input):
                 *head, last = rope
                 tail_pos_acc.append(last)
                 rope = new_rope
-            #print(cnt, moves_mapping[move])
-            #print_nicely(*rope)
+            # print(cnt, moves_mapping[move])
+            # print_nicely(*rope)
     return len(set(tail_pos_acc))
 
 
