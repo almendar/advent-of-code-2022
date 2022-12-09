@@ -11,6 +11,7 @@ DIAG_L_UP = (-1, 1)
 DIAG_R_DOWN = (1, -1)
 DIAG_L_DOWN = (-1, -1)
 DIAG_MOVES = (DIAG_L_DOWN, DIAG_L_UP, DIAG_R_DOWN, DIAG_R_UP)
+
 Point = namedtuple("Point", ["x", "y", "c"])
 
 
@@ -67,32 +68,6 @@ def next_pos(head, tail, move):
                     return (moved_head, maybe_tail)
 
 
-#
-
-
-# are overlapping
-
-# follow
-#    # disconnected
-#    if reachable_by_one_move(tail, moved_head):
-#        return (moved_head, tail)
-#
-#    # after move on diagonal
-#    if reachable_on_diag_move(tail, moved_head):
-#        return (moved_head, tail)
-#
-#    # follow
-#    if reachable_by_one_move(moved_tail, moved_head):
-#        return (moved_head, moved_tail)
-#
-#    #
-#    if reachable_on_diag_move(moved_head, moved_tail):
-#        for diag_m in DIAG_MOVES:
-#            maybe_tail = move_point(tail, diag_m)
-#            if reachable_by_one_move(maybe_tail, moved_tail):
-#                return (moved_head, maybe_tail)
-#
-#
 def print_nicely(*points):
     x_list = tuple(map(lambda p: p[0], points))
     y_list = tuple(map(lambda p: p[1], points))
@@ -124,28 +99,13 @@ def print_nicely(*points):
 
 
 moves = (RIGHT, LEFT, LEFT, RIGHT, DOWN, UP, UP, LEFT, LEFT)
-
-
 moves_mapping = {"R": RIGHT, "L": LEFT, "D": DOWN, "U": UP}
 
-input = """R 4
-U 4
-L 3
-D 1
-R 4
-D 1
-L 5
-R 2"""
-#
-# print_nicely(tail, head)
-# for m in moves:
-#    print_nicely(tail, head)
-#
+
 def part1(input):
 
     tail = Point(0, 0, "T")
     head = Point(0, 0, "H")
-
     tail_pos_acc = []
     with open(input) as f:
         for line in f:
@@ -156,4 +116,13 @@ def part1(input):
     return len(set(tail_pos_acc))
 
 
-run_day(9,part1,part1)
+def part2(input):
+    pass
+    # points = (Point(0, 0, "H"),) + tuple((Point(0, 0, f"i") for i in range(1, 10)))
+    # with open(input) as f:
+    #     for line in f:
+    #         (move, cnt) = line.strip().split(" ")
+    #         for px in range(1, len(points)):
+
+
+run_day(9, part1, part2)
