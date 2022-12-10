@@ -32,13 +32,13 @@ def run_trace(cpu, trace):
 
 def invoke(cpu, instruciton, trace):
     match instruciton:
-        case (ADDX_OPCODE, arg):
+        case(ADDX_OPCODE, arg):
             cpu[CYCLE_KEY] += 1
             run_trace(cpu, trace)
             cpu[CYCLE_KEY] += 1
             run_trace(cpu, trace)
             cpu[VAL_KEY] += arg
-        case (NOPE_OPCODE):
+        case(NOPE_OPCODE):
             cpu[CYCLE_KEY] += 1
             run_trace(cpu, trace)
 
@@ -49,23 +49,51 @@ def part1(input):
         tracer = {}
         for i in f:
             instruction = parse_instruction(i.strip())
-            print(instruction)
-            print(cpu)
             invoke(cpu, instruction, tracer)
-            print(cpu)
-            print(tracer)
-            print("-" * 20)
-        sum = 0 
-        for (k,v) in tracer.items():
+        sum = 0
+        for (k, v) in tracer.items():
             if k > 220:
                 break
-            sum += k*v
+            sum += k * v
         return sum
 
 
+def print_pixel(cycle, sprite_pos):
+    if cycle in range(sprite_pos - 1, sprite_pos + 2):
+        print("#", end="")
+    else:
+        print(".", end="")
+
+
 def part2(input):
-    pass
+    cpu = make_cpu()
+    busy_proc = False
+    increment = -1
+    sprite_pos = 1
+    with open(input) as f:
+        for cycle in range(1, 241):
+            screen_print = (cycle - 1) % 40
+            if not busy_proc:
+                instruction = f.readline().strip()
+                match parse_instruction(instruction):
+                    case(ADDX_OPCODE, number):
+                        busy_proc = True
+                        increment = number
+                    case(NOPE_OPCODE,):
+                        pass
+                print_pixel(screen_print, sprite_pos)
+            else:
+                print_pixel(screen_print, sprite_pos)
+                busy_proc = False
+                cpu[VAL_KEY] += increment
+                sprite_pos = cpu[VAL_KEY]
+            if cycle % 40 == 0:
+                print()
 
 
-run_day(10, part1, part2)
-#part1('input/day10-sample.txt')
+print(part1("input/day10-sample.txt"))
+print(part1("input/day10-input.txt"))
+print()
+part2("input/day10-sample.txt")
+print()
+part2("input/day10-input.txt")
