@@ -27,7 +27,6 @@ class Jungle():
     def one_move(self, monkey_number):
         self.inspections[monkey_number] += 1
         item_to_see = self.monkey_items[monkey_number].popleft()
-
         new_worry_leve = self.monkey_behaviour[monkey_number](item_to_see)
         worry_level_reduced = self.reduce_level(new_worry_leve)
         test = self.monkey_divs[monkey_number]
@@ -102,5 +101,16 @@ def part1():
     print(sample_jungle.monkey_business())
     print(input_junge.monkey_business())
 
+def part2():
+    from functools import reduce
+    sample_jungle.reduce_level = lambda x: x % reduce(lambda x,y: x*y, sample_jungle.monkey_divs, 1) 
+    input_junge.reduce_level = lambda x: x % reduce(lambda x,y: x*y, input_junge.monkey_divs, 1) 
+    for _ in range(0, 10000):
+        sample_jungle.move_round()
+        input_junge.move_round()
 
-part1()
+    print(sample_jungle.monkey_business())
+    print(input_junge.monkey_business())
+
+# part1()
+part2()
