@@ -1,5 +1,5 @@
 from util import run_day
-from enum import Enum
+from enum import IntEnum
 from functools import cmp_to_key
 
 
@@ -10,55 +10,40 @@ def read(input):
         return [k.split("\n") for k in items]
 
 
-class Decision(Enum):
+class Decision(IntEnum):
+    Wrong = -1
+    Undecided = 0
     Right = 1
-    Wrong = 2
-    Undecided = 3
+
+    @staticmethod
+    def from_int(a: int) -> "Decision":
+        if a < 0:
+            return Decision.Right
+        elif a > 0:
+            return Decision.Wrong
+        else:
+            return Decision.Undecided
 
 
 def process(ll: list, rl: list) -> Decision:
-    # print(ll, rl, sep=" VS ")
     to = min(len(ll), len(rl))
-
     for i in range(to):
-        match ll[i], rl[i]:
-            case list(li), list(ri):
-                d = process(li, ri)
-                if d == Decision.Undecided:
-                    continue
-                else:
-                    return d
-            case int(l_nr), int(r_nr):
-                # print(l_nr, r_nr, sep=" VS ")
-                if l_nr < r_nr:
-                    return Decision.Right
-                elif l_nr > r_nr:
-                    return Decision.Wrong
-                else:
-                    continue
-            case int(l_nr), list(ri):
-                # print(l_nr, ri, sep=" VS ")
-                d = process([l_nr], ri)
-                if d == Decision.Undecided:
-                    continue
-                else:
-                    return d
-            case list(li), int(l_nr):
-                # print(li, l_nr, sep=" VS ")
-                d = process(li, [l_nr])
-                if d == Decision.Undecided:
-                    continue
-                else:
-                    return d
-            case wat:
-                raise ValueError(wat)
+        decision = Decision.Undecided
 
-    if len(ll) < len(rl):
-        return Decision.Right
-    elif len(ll) == len(rl):
-        return Decision.Undecided
-    else:
-        return Decision.Wrong
+        match ll[i], rl[i]:
+            case int(l_nr), int(r_nr):
+                decision = Decision.from_int(l_nr - r_nr)
+            case list(li), list(ri):
+                decision = process(li, ri)
+            case int(l_nr), list(ri):
+                decision = process([l_nr], ri)
+            case list(li), int(l_nr):
+                decision = process(li, [l_nr])
+
+        if decision != Decision.Undecided:
+            return decision
+
+    return Decision.from_int(len(ll) - len(rl))
 
 
 def part1(input):
@@ -86,24 +71,10 @@ def part2(input):
         acc.append(l)
         acc.append(r)
 
-    # def cmp(l, r):
-    #     match process(l, r):
-    #         case Decision.Right:
-    #             return -1
-    #         case Decision.Wrong:
-    #             return 1
-    #         case Decision.Undecided:
-    #             return 0
-    # acc.sort(key=cmp_to_key(cmp))
+    def cmp(l, r):
+        return process(l, r).value
 
-    # bubble sort, lol
-    n = len(acc)
-    for i in range(n):
-        for j in range(n - i - 1):
-            left, right = acc[j], acc[j + 1]
-            d = process(left, right)
-            if d == Decision.Wrong:
-                acc[j], acc[j + 1] = acc[j + 1], acc[j]
+    acc.sort(key=cmp_to_key(cmp))
 
     i1 = acc.index([[2]]) + 1
     i2 = acc.index([[6]]) + 1
@@ -111,3 +82,8 @@ def part2(input):
 
 
 run_day(13, part1, part2)
+
+# day13-part1-sample: 13
+# day13-part1-input: 5196
+# day13-part2-sample: 140
+# day13-part1-input: 22134
