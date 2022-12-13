@@ -73,7 +73,29 @@ def part1(input):
 
 
 def part2(input):
-    return -1
+    inputs = read(input)
+    acc = [
+        eval("[[2]]"),
+        eval("[[6]]"),
+    ]
+
+    for lStr, rStr in inputs:
+        l = eval(lStr)
+        r = eval(rStr)
+        acc.append(l)
+        acc.append(r)
+
+    n = len(acc)
+    # bubble sort, lol
+    for i in range(n):
+        for j in range(n - i - 1):
+            left, right = acc[j], acc[j + 1]
+            d = process(left, right)
+            if d == Decision.Wrong:
+                acc[j], acc[j + 1] = acc[j + 1], acc[j]
+    i1 = acc.index([[2]]) + 1
+    i2 = acc.index([[6]]) + 1
+    return i1 * i2
 
 
 run_day(13, part1, part2)
