@@ -1,5 +1,6 @@
 from util import run_day
 from enum import Enum
+from functools import cmp_to_key
 
 
 def read(input):
@@ -85,14 +86,25 @@ def part2(input):
         acc.append(l)
         acc.append(r)
 
-    n = len(acc)
+    # def cmp(l, r):
+    #     match process(l, r):
+    #         case Decision.Right:
+    #             return -1
+    #         case Decision.Wrong:
+    #             return 1
+    #         case Decision.Undecided:
+    #             return 0
+    # acc.sort(key=cmp_to_key(cmp))
+
     # bubble sort, lol
+    n = len(acc)
     for i in range(n):
         for j in range(n - i - 1):
             left, right = acc[j], acc[j + 1]
             d = process(left, right)
             if d == Decision.Wrong:
                 acc[j], acc[j + 1] = acc[j + 1], acc[j]
+
     i1 = acc.index([[2]]) + 1
     i2 = acc.index([[6]]) + 1
     return i1 * i2
