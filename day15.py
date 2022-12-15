@@ -1,8 +1,5 @@
-from typing import NamedTuple, FrozenSet, Dict, NewType, Tuple, Set
+from typing import NamedTuple
 from dataclasses import dataclass, field
-
-sample_txt = "input/day15-sample.txt"
-input_txtx = "input/day15-input.txt"
 
 
 class Coord(NamedTuple):
@@ -52,25 +49,54 @@ def coverage_at_y(s: Sensor, y: int):
 
 def part1(input, y_pos):
     input_data = read_input(input)
-    trtrt = set()
+    sensors: list[Sensor] = []
     for ft in input_data:
         s, b = ft
-        trtrt |= coverage_at_y(Sensor(s, b), y_pos)
-        if b.y == y_pos:
-            trtrt.remove(b)
-    return len(trtrt)
+        sensors.append(Sensor(s, b))
+
+    x_min = min(map(lambda it: it.loc.x - it.max_reach, sensors))
+    x_max = max(map(lambda it: it.loc.x + it.max_reach, sensors))
+    count = 0
+    for xi in range(x_min, x_max + 1):
+        for s in sensors:
+            if s.covers(Coord(xi, y_pos)) and not Coord(xi, y_pos) == s.beacon:
+                count += 1
+                break
+
+    return count
 
 
-def part2(input):
-    pass
-    # input_data = read_input(input)
-    # trtrt = set()
-    # for ft in input_data:
-    #     s, b = ft
-    #     trtrt |= coverage_at_y(Sensor(s, b), y_pos)
-    #     if b.y == y_pos:
-    #         trtrt.remove(b)
+def part2(input, max):
+    input_data = read_input(input)
+    sensors: list[Sensor] = []
+    for ft in input_data:
+        s, b = ft
+        sensors.append(Sensor(s, b))
+
+    def look():
+        for x in range(0, max + 1):
+            y = 0
+            while y <= max:
+                anySensorCovering = [s for s in sensors if s.covers(Coord(x, y))]
+                if not anySensorCovering:
+                    return Coord(x, y)
+                sensor = anySensorCovering[0]
+                y = sensor.loc.y + sensor.max_reach - abs(x - sensor.loc.x) + 1
+        raise ValueError()
+
+    p = look()
+    return p.x * 4000000 + p.y
 
 
+sample_txt = "input/day15-sample.txt"
+input_txtx = "input/day15-input.txt"
+
+# 26
+# 5240818
 print(part1(sample_txt, 10))
 print(part1(input_txtx, 2000000))
+
+# 56000011
+# 13213086906101
+print(part2(sample_txt, 20))
+print(part2(input_txtx, 4000000))
