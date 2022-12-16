@@ -24,3 +24,12 @@ def compose(*fs):
 def pipe(arg, *fs):
     return compose(*fs)(arg)
 
+
+def read_lines(input: str):
+    with open(input) as f:
+        for i in f:
+            yield i.strip()
+
+
+def day_data(day):
+    return (f"input/day{day}-sample.txt", f"input/day{day}-input.txt")
