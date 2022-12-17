@@ -1,5 +1,5 @@
 from dataclasses import dataclass, field
-from typing import NamedTuple, Tuple, List
+from typing import NamedTuple, Tuple, List, FrozenSet
 from itertools import cycle
 from functools import reduce
 from util import run_day
@@ -40,10 +40,10 @@ class Coord(NamedTuple):
 
 @dataclass()
 class Rock:
-    shape: list[list[int]]
+    shape: List[List[int]]
     left_top: Coord
 
-    points: frozenset[Coord] = field(init=False)
+    points: FrozenSet[Coord] = field(init=False)
     smashed_into_wall: bool = field(init=False)
     ground_level: bool = field(init=False)
 
@@ -85,10 +85,10 @@ class Rock:
 
 
 class Cave:
-    def __init__(self, rocks: list[Rock]) -> None:
+    def __init__(self, rocks: List[Rock]) -> None:
         if rocks == None:
             rocks = []
-        self.rocks: list[Rock] = rocks
+        self.rocks: List[Rock] = rocks
         self.current_top = 0
 
     def print_cave_with_rock(self, maybeRock):
@@ -98,7 +98,15 @@ class Cave:
         maybeCave.print()
 
     def collides(self, rock: Rock):
-        return any(map(lambda x: x.collision(rock), self.rocks))
+        for groundRock in self.rocks:
+            if groundRock.collision(rock):
+                return True
+
+            # don't look too deep, we sorted rocks
+            if rock.left_top.y - 5 > groundRock.left_top.y:
+                return False
+
+        return False
 
     def add(self, rock: Rock):
         self.rocks.append(rock)
@@ -141,33 +149,40 @@ class Wind:
         self.wind -= 1
 
 
+def drop_rocks(winds, number_of_moves):
+    cave = Cave([])
+    wind = Wind(winds)
+    for i, next_piece in enumerate(cycle(pieces)):
+        if i == number_of_moves:
+            break
+        rock = Rock(next_piece, Coord(3, cave.current_top + 3 + len(next_piece)))
+
+        rock = rock.gas_blow(cave, wind.next_wind())
+
+        while True:
+            rock = rock.move(0, -1)
+            if rock.ground_level or cave.collides(rock):
+                # found our place, backtrace
+                cave.add(rock.move(0, 1))
+                break
+            else:
+                rock = rock.gas_blow(cave, wind.next_wind())
+    return cave.current_top
+
+
 def part1(input):
     with open(input) as f:
         winds = next(f)
-        cave = Cave([])
-        wind = Wind(winds)
-        for i, next_piece in enumerate(cycle(pieces)):
-            if i == 2022:
-                break
-            rock = Rock(next_piece, Coord(3, cave.current_top + 3 + len(next_piece)))
-            # print("new-start", cave.current_top)
-            # cave.print_cave_with_rock(rock)
-
-            rock = rock.gas_blow(cave, wind.next_wind())
-
-            while True:
-                rock = rock.move(0, -1)
-                if rock.ground_level or cave.collides(rock):
-                    # found our place, backtrace
-                    cave.add(rock.move(0, 1))
-                    break
-                else:
-                    rock = rock.gas_blow(cave, wind.next_wind())
-        return cave.current_top
+        return drop_rocks(winds, number_of_moves=2022)
 
 
 def part2(input):
-    return -1
+    with open(input) as f:
+        winds = next(f)
+    WIND = len(winds)
+    FIGURES = 5
+    count_to = WIND * FIGURES
+    return drop_rocks(winds, number_of_moves=count_to)
 
 
 run_day(17, part1, part2)
