@@ -1,6 +1,8 @@
 from util import day_data, read_lines
-from typing import List, DefaultDict, NamedTuple, FrozenSet, MutableSet
-from util import run_day
+from typing import List, NamedTuple, MutableSet
+from itertools import chain, combinations
+from util import run_day, day_data
+import time
 
 Label = str
 
@@ -64,9 +66,16 @@ def DFS(
     left_moves,
     per_minute,
     total,
+    memoization,
 ) -> int:
+
+    if (start, frozenset(already_open), total) in memoization:
+        return memoization[(start, frozenset(already_open), left_moves, total)]
+
     if left_moves == 0:
         return total
+    elif left_moves < 0:
+        return -1
 
     node = G[start]
     left_unopen = frozenset(filter(lambda x: G[x].flow > 0, G)) - already_open
@@ -74,7 +83,7 @@ def DFS(
     if len(left_unopen) == 0 and left_moves >= 0:
         return total + left_moves * per_minute
 
-    distances_set = set([0])
+    distances_set = set()
     for next_unopened in left_unopen:
         distance_there = distances[node.label][next_unopened]
         if distance_there > left_moves:
@@ -90,23 +99,58 @@ def DFS(
             next_unopened,
             opened_copy,
             left_moves - distance_there - 1,
-            per_minute=per_minute + G[next_unopened].flow,
-            total=total + flow_on_this_move,
+            per_minute + G[next_unopened].flow,
+            total + flow_on_this_move,
+            memoization,
         )
         distances_set.add(d)
 
     ret = max(distances_set)
+    memoization[(start, frozenset(already_open), left_moves, total)] = ret
     return ret
 
 
 def part1(input):
     G = read_graph(input)
     distances, _ = graph_travel_costs(G)
-    return DFS(G, distances, "AA", set(), 30, 0, 0)
+    a = DFS(G, distances, "AA", set([]), 30, 0, 0, {})
+    return a
+
+
+def powerset(iterable):
+    s = set(iterable)
+    return chain.from_iterable(set(combinations(s, r)) for r in range(len(s) + 1))
+
+
+def current_milli_time():
+    return round(time.time() * 1000)
 
 
 def part2(input):
-    return -1
+    max_flow = -1
+    G = read_graph(input)
+    all_with_flow = set(filter(lambda x: G[x].flow > 0, G))
+    distances, _ = graph_travel_costs(G)
+    subset = set(powerset(all_with_flow))
+    memoization = {}
+    start = current_milli_time()
+    for i, sub in enumerate(subset):
+        me = set(sub)
+        elephant = all_with_flow - me
+        if len(me) == 0 or len(elephant) == 0:
+            continue
+
+        if i % 100 == 0:
+            now = current_milli_time()
+            print((now - start) / 1000, i, me, elephant)
+
+        meFlow = DFS(G, distances, "AA", me, 26, 0, 0, memoization)
+        elephanFlow = DFS(G, distances, "AA", elephant, 26, 0, 0, memoization)
+        max_flow = max(max_flow, meFlow + elephanFlow)
+    return max_flow
 
 
 run_day(16, part1, part2)
+# sample, input = day_data(16)
+# print(part2(sample))
+# print(part2(input))
