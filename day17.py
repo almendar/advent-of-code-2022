@@ -2,7 +2,7 @@ from dataclasses import dataclass, field
 from typing import NamedTuple, Tuple, List, FrozenSet
 from itertools import cycle
 from functools import reduce
-from util import run_day
+from util import run_day, day_data
 
 # fmt: off
 pieces = [
@@ -90,6 +90,8 @@ class Cave:
             rocks = []
         self.rocks: List[Rock] = rocks
         self.current_top = 0
+        self.pattern = 0
+        self.mins = [0, 0, 0, 0, 0, 0, 0]
 
     def print_cave_with_rock(self, maybeRock):
         newRocks = self.rocks[:]
@@ -109,6 +111,8 @@ class Cave:
         return False
 
     def add(self, rock: Rock):
+        for x, y in rock.points:
+            self.mins[x - 1] = max(self.mins[x - 1], y)
         self.rocks.append(rock)
         self.rocks.sort(key=lambda x: -x.left_top.y)
         self.current_top = self.rocks[0].left_top.y
@@ -149,6 +153,18 @@ class Wind:
         self.wind -= 1
 
 
+def drop_rock(cave, wind, rock):
+    rock = rock.gas_blow(cave, wind.next_wind())
+    while True:
+        rock = rock.move(0, -1)
+        if rock.ground_level or cave.collides(rock):
+            # found our place, backtrace
+            cave.add(rock.move(0, 1))
+            break
+        else:
+            rock = rock.gas_blow(cave, wind.next_wind())
+
+
 def drop_rocks(winds, number_of_moves):
     cave = Cave([])
     wind = Wind(winds)
@@ -156,18 +172,26 @@ def drop_rocks(winds, number_of_moves):
         if i == number_of_moves:
             break
         rock = Rock(next_piece, Coord(3, cave.current_top + 3 + len(next_piece)))
+        drop_rock(cave, wind, rock)
 
-        rock = rock.gas_blow(cave, wind.next_wind())
-
-        while True:
-            rock = rock.move(0, -1)
-            if rock.ground_level or cave.collides(rock):
-                # found our place, backtrace
-                cave.add(rock.move(0, 1))
-                break
-            else:
-                rock = rock.gas_blow(cave, wind.next_wind())
     return cave.current_top
+
+
+def find_cycle(cave: Cave, wind):
+    cycle_detector = {}
+    for i, next_piece in enumerate(cycle(pieces)):
+
+        min_of_minx = min(cave.mins)
+        cave_mins = tuple((cave.mins[i] - min_of_minx for i in range(len(cave.mins))))
+        key = (cave_mins, wind.wind, i % 5)
+
+        if key in cycle_detector:
+            return (cycle_detector[key], (cave.current_top, i - 1))
+        else:
+            cycle_detector[key] = (cave.current_top, i - 1)
+
+        rock = Rock(next_piece, Coord(3, cave.current_top + 3 + len(next_piece)))
+        drop_rock(cave, wind, rock)
 
 
 def part1(input):
@@ -177,12 +201,24 @@ def part1(input):
 
 
 def part2(input):
+    winds = None
     with open(input) as f:
         winds = next(f)
-    WIND = len(winds)
-    FIGURES = 5
-    count_to = WIND * FIGURES
-    return drop_rocks(winds, number_of_moves=count_to)
+    NUMBER_OF_ROCKS = 1000000000000
+    cave = Cave([])
+    wind = Wind(winds)
+    (top_star, i), (top_end, j) = find_cycle(cave, wind)
+
+    cykle_length = j - i
+    delta = top_end - top_star
+    number_of_times = NUMBER_OF_ROCKS // cykle_length
+    left = NUMBER_OF_ROCKS - (number_of_times * cykle_length)
+    leftovers = drop_rocks(winds, number_of_moves=left)
+    return number_of_times * delta + leftovers
 
 
-run_day(17, part1, part2)
+# Tyle ma być
+# 1553314121019
+_, input = day_data(17)
+# run_day(17, part1, part2)
+print(part2(input))
