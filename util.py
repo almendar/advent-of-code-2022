@@ -31,5 +31,5 @@ def read_lines(input: str):
             yield i.strip()
 
 
-def day_data(day):
+def day_data(day: int):
     return (f"input/day{day}-sample.txt", f"input/day{day}-input.txt")
