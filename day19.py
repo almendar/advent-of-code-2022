@@ -206,20 +206,30 @@ def simulate(blueprint: Blueprint, MAX_TIME):
             )
 
         # Do nothing
-        Q.appendleft(nextState(state, blueprint, Build()))
+        ns = nextState(state, blueprint, Build())
+        if ns.moneybag.geode >= bestSoFar:
+            Q.appendleft(ns)
 
         # Ore robot
         if current_robots_can_build.ore and not state.prevBuildOptions.ore:
-            Q.appendleft(nextState(state, blueprint, Build(ore=True)))
+            ns = nextState(state, blueprint, Build(ore=True))
+            if ns.moneybag.geode >= bestSoFar:
+                Q.appendleft(ns)
 
         if current_robots_can_build.clay and not state.prevBuildOptions.clay:
-            Q.appendleft(nextState(state, blueprint, Build(clay=True)))
+            ns = nextState(state, blueprint, Build(clay=True))
+            if ns.moneybag.geode >= bestSoFar:
+                Q.appendleft(ns)
 
         if current_robots_can_build.obsidian and not state.prevBuildOptions.obsidian:
-            Q.appendleft(nextState(state, blueprint, Build(obsidian=True)))
+            ns = nextState(state, blueprint, Build(obsidian=True))
+            if ns.moneybag.geode >= bestSoFar:
+                Q.appendleft(ns)
 
         if current_robots_can_build.geodot and not state.prevBuildOptions.geodot:
-            Q.appendleft(nextState(state, blueprint, Build(geodot=True)))
+            ns = nextState(state, blueprint, Build(geodot=True))
+            if ns.moneybag.geode >= bestSoFar:
+                Q.appendleft(ns)
 
         # prunning cound
         if current_robots_can_build.ore and state.prevBuildOptions.ore:
@@ -247,7 +257,7 @@ def simulate_part2(blueprint):
 
 def part1(input):
     with multiprocessing.Pool(4) as pool:
-        blueprints = Blueprint.from_file(sample_txt)
+        blueprints = Blueprint.from_file(input)
         results = 0
         for result in pool.map(simulate_part1, blueprints):
             bestSoFar, id = result
@@ -257,11 +267,12 @@ def part1(input):
 
 def part2(input):
     with multiprocessing.Pool(4) as pool:
-        blueprints = Blueprint.from_file(sample_txt)
+        blueprints = Blueprint.from_file(input)[:3]
         results = 1
         for result in pool.map(simulate_part2, blueprints):
-            print(result)
+            results *= result[0]
         return results
 
 
-print(part2(sample_txt))
+print(part1(input_txt))
+print(part2(input_txt))
