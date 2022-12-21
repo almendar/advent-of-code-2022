@@ -1,2 +1,7 @@
 .vscode/
 __pycache__/
+.scala-build
+.pytest_cache/
+.mypy_cache/
+.bsp/
+.metals/
