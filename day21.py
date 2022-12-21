@@ -90,7 +90,7 @@ class MonkeyShow:
                 left_contains = self.contains_monkey(self.HUMN, self.monkeys[left])
                 right_contains = self.contains_monkey(self.HUMN, self.monkeys[right])
                 if right_contains and left_contains:
-                    raise ValueError("Assumtion does not holds")
+                    raise ValueError("Assumption does not hold")
 
                 if left_contains:
                     right_value = self.monkeys[right].shout()
