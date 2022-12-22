@@ -183,3 +183,120 @@ maze.simulate(i)
 score = {">": 0, "v": 1, "<": 2, "^": 3}
 password = 1000 * (maze.pos.y + 1) + 4 * (maze.pos.x + 1) + score[maze.face]
 print(password)
+
+
+# par2
+
+
+def detect_wall_number(c: Coord):
+    if c.y < 50:
+        if c.x < 100 and c.x >= 50:
+            return 1
+        elif c.x < 150 and c.x >= 100:
+            return 2
+
+    if c.y < 100:
+        if c.x >= 50 and c.x < 100:
+            return 3
+
+    if c.y < 150:
+        if c.x < 50:
+            return 4
+        elif c.x >= 50 and c.x < 100:
+            return 5
+
+    if c.y < 200 and c.y >= 150:
+        if c.x < 50:
+            return 6
+
+    raise ValueError("Opps")
+
+
+translation_layer = {
+    # for X
+    "1": {">": (50, 50, ">")},
+    "2": {">": (100, 50, "<")},
+    "4": {},
+}
+
+# for y,row in enumerate(maze.m):
+#     for x, c in enumerate(row):
+#         if c == " ":
+#             continue
+#         print(x,y,detect_wall_number(Coord(x,y)))
+
+
+# par2
+def detect_wall_number(c: Coord):
+    if c.y < 50:
+        if c.x < 100 and c.x >= 50:
+            return 1
+        elif c.x < 150 and c.x >= 100:
+            return 2
+
+    if c.y < 100:
+        if c.x >= 50 and c.x < 100:
+            return 3
+
+    if c.y < 150:
+        if c.x < 50:
+            return 4
+        elif c.x >= 50 and c.x < 100:
+            return 5
+
+    if c.y < 200 and c.y >= 150:
+        if c.x < 50:
+            return 6
+
+    raise ValueError("Opps")
+
+
+# fmt: off
+translation_layer = {
+    # for X
+    "1": {
+        ">": (50, 50, ">"),
+        "<":(),
+        "v":(50,50, "v"),
+        "^":()
+    },
+
+    "2": {
+        ">": (100, 50, "<")
+    },
+
+    "3": {
+        ">":(),
+        "<":(),
+        "v":(),
+        "^":()
+    },
+
+    "4": {
+        ">":(),
+        "<":(),
+        "v":(),
+        "^":()
+    },
+    "5": {
+        ">":(),
+        "<":(),
+        "v":(),
+        "^":()
+    },
+
+    "6": {
+        ">":(),
+        "<":(),
+        "v":(),
+        "^":()
+    },
+}
+# fmt: on
+
+
+# for y,row in enumerate(maze.m):
+#     for x, c in enumerate(row):
+#         if c == " ":
+#             continue
+#         print(x,y,detect_wall_number(Coord(x,y)))
