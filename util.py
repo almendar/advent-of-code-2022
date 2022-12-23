@@ -5,15 +5,15 @@ import operator
 
 def run_day(day, part1, part2):
     (sample, input) = day_data(day)
+
     p1_sample = part1(sample)
+    print(f"day{day}-part1-sample: {p1_sample}")
     p1_input = part1(input)
+    print(f"day{day}-part1-input: {p1_input}")
 
     p2_sample = part2(sample)
-    p2_input = part2(input)
-
-    print(f"day{day}-part1-sample: {p1_sample}")
-    print(f"day{day}-part1-input: {p1_input}")
     print(f"day{day}-part2-sample: {p2_sample}")
+    p2_input = part2(input)
     print(f"day{day}-part1-input: {p2_input}")
 
 
